@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +38,7 @@ class TubelightShell extends ConsumerWidget {
     final token = ref.watch(authTokenProvider);
     final authed = token != null && token.isNotEmpty;
 
-    return Scaffold(
+    final shell = Scaffold(
       backgroundColor: SwColors.white,
       body: child,
       bottomNavigationBar: Material(
@@ -91,6 +92,35 @@ class TubelightShell extends ConsumerWidget {
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (!kIsWeb) return shell;
+    final w = MediaQuery.sizeOf(context).width;
+    if (w <= 520) return shell;
+    return ColoredBox(
+      color: const Color(0xFFE8E8E8),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 430,
+            maxHeight: MediaQuery.sizeOf(context).height - 48,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: SwColors.white,
+              border: Border.all(color: SwColors.border),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(blurRadius: 20, offset: Offset(0, 6), color: Color(0x40000000)),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: shell,
             ),
           ),
         ),

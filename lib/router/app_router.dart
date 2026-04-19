@@ -19,6 +19,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/auth-callback',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Signing in…')),
+        ),
+      ),
       ShellRoute(
         builder: (context, state, child) => TubelightShell(child: child),
         routes: [

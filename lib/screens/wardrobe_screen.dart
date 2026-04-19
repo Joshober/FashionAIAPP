@@ -251,7 +251,6 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                           ),
                           itemBuilder: (context, i) {
                             final p = _filtered[i];
-                            final id = p['_id']?.toString() ?? '';
                             final url = resolveMediaUrl(base, p['imagen_url']?.toString());
                             final tipo = p['tipo']?.toString() ?? '';
                             final cls = p['clase_nombre']?.toString() ?? '';

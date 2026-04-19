@@ -75,6 +75,26 @@ class OutfitRichCard extends StatelessWidget {
     final score = outfit['puntuacion']?.toString() ?? '—';
     final expl = outfit['explicacion']?.toString() ?? '';
     final pieces = _pieces();
+    final body = pieces.isEmpty
+        ? const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              'No garment images embedded in this outfit payload.',
+              style: TextStyle(color: SwColors.gray, fontWeight: FontWeight.w700),
+            ),
+          )
+        : SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < pieces.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  pieces[i],
+                ],
+              ],
+            ),
+          );
 
     return Container(
       decoration: BoxDecoration(
@@ -104,18 +124,7 @@ class OutfitRichCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var i = 0; i < pieces.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 10),
-                  pieces[i],
-                ],
-              ],
-            ),
-          ),
+          body,
           if (expl.isNotEmpty) ...[
             const SizedBox(height: 14),
             Theme(

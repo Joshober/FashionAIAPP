@@ -232,7 +232,7 @@ class _GenerateScreenState extends ConsumerState<GenerateScreen> {
                       crossAxisCount: cross,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 0.95,
+                      childAspectRatio: 0.82,
                     ),
                     itemBuilder: (context, i) {
                       final o = _recs[i];

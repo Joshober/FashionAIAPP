@@ -145,7 +145,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     FilledButton(
                       onPressed: () async {
                         await auth0?.login();
-                        if (mounted) setState(() {});
+                        if (mounted) {
+                          context.go('/settings');
+                          setState(() {});
+                        }
                       },
                       child: const Text('SIGN IN'),
                     ),

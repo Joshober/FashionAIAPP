@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../core/media_url.dart';
 import '../providers/api_base.dart';
 import '../providers/repositories.dart';
-import '../widgets/app_drawer.dart';
+import '../theme/app_theme.dart';
+import '../widgets/sw_components.dart';
 
 class PrendaDetailScreen extends ConsumerStatefulWidget {
   const PrendaDetailScreen({super.key, required this.id});
@@ -52,14 +53,14 @@ class _PrendaDetailScreenState extends ConsumerState<PrendaDetailScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Occasions'),
+        title: const Text('OCCASIONS'),
         content: TextField(
           controller: ctrl,
           decoration: const InputDecoration(hintText: 'comma-separated, e.g. work, weekend'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('SAVE')),
         ],
       ),
     );
@@ -80,8 +81,8 @@ class _PrendaDetailScreenState extends ConsumerState<PrendaDetailScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Delete garment?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('DELETE')),
         ],
       ),
     );
@@ -98,47 +99,83 @@ class _PrendaDetailScreenState extends ConsumerState<PrendaDetailScreen> {
   Widget build(BuildContext context) {
     final base = ref.watch(apiBaseUrlProvider);
     return Scaffold(
+      backgroundColor: SwColors.white,
       appBar: AppBar(
+        leading: BackButton(onPressed: () => context.go('/wardrobe')),
         title: const Text('Garment'),
-        actions: [
-          if (_p != null)
-            IconButton(onPressed: _editOccasion, icon: const Icon(Icons.edit_calendar_outlined)),
-          if (_p != null) IconButton(onPressed: _delete, icon: const Icon(Icons.delete_outline)),
-        ],
       ),
-      drawer: const AppDrawer(),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? Center(child: Text(_error!))
-              : _p == null
-                  ? const SizedBox.shrink()
-                  : ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Builder(
-                              builder: (context) {
-                                final u = resolveMediaUrl(base, _p!['imagen_url']?.toString());
-                                if (u.isEmpty) {
-                                  return Container(color: Colors.grey.shade300);
-                                }
-                                return Image.network(u, fit: BoxFit.cover);
-                              },
+      body: SwPageContainer(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? Center(child: SwCard(child: Text(_error!)))
+                : _p == null
+                    ? const SizedBox.shrink()
+                    : ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                        children: [
+                          SwCard(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 4 / 5,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final u = resolveMediaUrl(base, _p!['imagen_url']?.toString());
+                                      if (u.isEmpty) {
+                                        return Container(color: SwColors.light);
+                                      }
+                                      return Image.network(u, fit: BoxFit.cover);
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${_p!['tipo']}',
+                                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text('Class: ${_p!['clase_nombre']}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                                      if ((_p!['color']?.toString() ?? '').isNotEmpty)
+                                        Text('Color: ${_p!['color']}', style: const TextStyle(color: SwColors.gray, fontWeight: FontWeight.w600)),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Occasions: ${(_p!['ocasion'] as List?)?.join(', ') ?? ''}',
+                                        style: const TextStyle(color: SwColors.gray, fontWeight: FontWeight.w600),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: OutlinedButton(
+                                              onPressed: _editOccasion,
+                                              child: const Text('EDIT OCCASION'),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: FilledButton(
+                                              onPressed: _delete,
+                                              child: const Text('DELETE'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text('Type: ${_p!['tipo']}', style: Theme.of(context).textTheme.titleMedium),
-                        Text('Class: ${_p!['clase_nombre']}'),
-                        Text('Color: ${_p!['color']}'),
-                        Text('Confidence: ${_p!['confianza']}'),
-                        Text('Occasions: ${(_p!['ocasion'] as List?)?.join(', ') ?? ''}'),
-                      ],
-                    ),
+                        ],
+                      ),
+      ),
     );
   }
 }

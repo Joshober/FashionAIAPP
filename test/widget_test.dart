@@ -23,6 +23,6 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('DASHBOARD'), findsOneWidget);
   });
 }

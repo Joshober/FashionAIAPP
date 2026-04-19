@@ -1,7 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -93,10 +95,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         try {
           final bytes = await repo.tts(r.reply);
           if (bytes.isNotEmpty) {
-            final dir = await getTemporaryDirectory();
-            final f = File('${dir.path}/tts_out.wav');
-            await f.writeAsBytes(bytes);
-            await _player.setFilePath(f.path);
+            final wav = bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
+            await _player.setAudioSource(
+              AudioSource.uri(Uri.dataFromBytes(wav, mimeType: 'audio/wav')),
+            );
             await _player.play();
           }
         } catch (_) {
@@ -130,7 +132,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       setState(() => _recording = false);
       if (path == null) return;
       try {
-        final bytes = await File(path).readAsBytes();
+        final bytes = await XFile(path).readAsBytes();
         final b64 = base64Encode(bytes);
         final text = await ref.read(chatRepositoryProvider).transcribeWavBase64(b64);
         if (text.isNotEmpty) await _send(text);
@@ -141,12 +143,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
     } else {
       if (await _recorder.hasPermission()) {
-        final dir = await getTemporaryDirectory();
-        final filePath = '${dir.path}/chat_stt.wav';
-        await _recorder.start(
-          const RecordConfig(encoder: AudioEncoder.wav),
-          path: filePath,
-        );
+        if (kIsWeb) {
+          await _recorder.start(const RecordConfig(encoder: AudioEncoder.wav));
+        } else {
+          final dir = await getTemporaryDirectory();
+          await _recorder.start(
+            const RecordConfig(encoder: AudioEncoder.wav),
+            path: '${dir.path}/chat_stt.wav',
+          );
+        }
         setState(() => _recording = true);
       }
     }
@@ -180,7 +185,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       onPressed: () async {
                         try {
                           await auth0?.login();
-                          if (mounted) setState(() {});
+                          if (mounted) {
+                            context.go('/chat');
+                            setState(() {});
+                          }
                         } catch (e) {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
