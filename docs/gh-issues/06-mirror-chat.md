@@ -13,9 +13,9 @@ Implement **Mirror** and **Chat** against OpenRouter from the server only: mirro
 
 ## References
 
-- OpenRouter contract documented in `backend/README.md` or [docs/CONTRACTS.md](../CONTRACTS.md).
+- OpenRouter contract documented in `backend/README.md` or [docs/CONTRACTS.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/CONTRACTS.md).
 - Flutter must never ship `OPENROUTER_API_KEY`.
 
 ## Dependencies
 
-Prendas and `/api/me` data paths should exist for rich context ([05-outfits-me.md](./05-outfits-me.md), [04-prendas-crud.md](./04-prendas-crud.md)).
+Prendas and `/api/me` data paths should exist for rich context ([05-outfits-me.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/05-outfits-me.md), [04-prendas-crud.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/04-prendas-crud.md)).
