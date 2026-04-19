@@ -1,12 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { Suspense, lazy, useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
-import axios from 'axios'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
 import { TubelightNavbar } from './components/ui/tubelight-navbar'
-import { AuthTokenSetup } from './components/AuthTokenSetup'
-import { getRedirectOrigin } from './utils/auth0Redirect'
-
-const routerFuture = { v7_startTransition: true, v7_relativeSplatPath: true }
+import { useAuth } from './context/AuthContext'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Wardrobe = lazy(() => import('./pages/Wardrobe'))
@@ -20,37 +15,19 @@ const Mirror = lazy(() => import('./pages/Mirror'))
 const MirrorContext = lazy(() => import('./pages/MirrorContext'))
 const WardrobeChat = lazy(() => import('./pages/WardrobeChat'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Login = lazy(() => import('./pages/Login'))
 
-function App() {
-  const { isAuthenticated, loginWithRedirect, getAccessTokenSilently } = useAuth0()
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      delete axios.defaults.headers.common['Authorization']
-      return
-    }
-    let cancelled = false
-    getAccessTokenSilently()
-      .then((token) => {
-        if (!cancelled) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      })
-      .catch(() => {
-        if (!cancelled) delete axios.defaults.headers.common['Authorization']
-      })
-    return () => { cancelled = true }
-  }, [isAuthenticated, getAccessTokenSilently])
+function AppRoutes() {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   return (
-<Router future={routerFuture}>
-        <AuthTokenSetup />
-        <div
-          className="min-h-dvh overflow-x-hidden app-shell"
-          style={{ background: 'var(--sw-white, #F5F4F0)' }}
-        >
-        <TubelightNavbar
-          isAuthenticated={isAuthenticated}
-          onLogin={() => loginWithRedirect({ authorizationParams: { redirect_uri: getRedirectOrigin() } })}
-        />
+    <>
+      <div
+        className="min-h-dvh overflow-x-hidden app-shell"
+        style={{ background: 'var(--sw-white, #F5F4F0)' }}
+      >
+        <TubelightNavbar isAuthenticated={isAuthenticated} onLogin={() => navigate('/login')} />
         <div className="pb-[max(5.75rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))]">
           <Suspense
             fallback={
@@ -62,6 +39,7 @@ function App() {
             }
           >
             <Routes>
+              <Route path="/login" element={<Login />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/wardrobe" element={<Wardrobe />} />
               <Route path="/wardrobe/outfits" element={<WardrobeOutfits />} />
@@ -80,9 +58,12 @@ function App() {
           </Suspense>
         </div>
       </div>
-    </Router>
+    </>
   )
 }
 
-export default App
+function App() {
+  return <AppRoutes />
+}
 
+export default App

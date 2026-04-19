@@ -1,16 +1,15 @@
-# Render Blueprint (free tier): Node API + Flutter web (Docker/nginx).
-# - API (`fashionai-api`): builds from the repo default branch (main).
-# - Web (`fashionai-web`): builds from branch `Webapp` (Flutter web parity).
-# URLs follow https://<service-name>.onrender.com — keep these names or update
-# ALLOWED_ORIGINS / API_BASE_URL together.
+# Render Blueprint (free tier): Node API + Vite React web (`webapp/`).
+# - API (`fashionai-api`): Express + MongoDB; proxies HF ViT classify and OpenRouter
+#   (chat, audio, mirror, and ViT-failure vision classify fallback).
+# - Web (`fashionai-web`): static build from `webapp/` (React + Vite), SPA rewrites.
+# URLs follow https://<service-name>.onrender.com — keep service names aligned with
+# ALLOWED_ORIGINS on the API and VITE_* URLs on the web build.
 #
-# First deploy: you MUST set MONGODB_URI (e.g. MongoDB Atlas free M0 cluster +
-# Database Access user + Network Access allow 0.0.0.0/0). If the blueprint
-# wizard skipped sync: false vars, add MONGODB_URI under Environment manually.
-# Also set OPENROUTER_API_KEY for chat/audio features.
+# First deploy: set MONGODB_URI in the Dashboard if the wizard omitted sync: false vars.
+# Set OPENROUTER_API_KEY for mirror, chat/audio, and classify fallback when HF is down.
 #
-# Auth0 (optional): set AUTH0_DOMAIN + AUTH0_AUDIENCE; add Allowed Callback URL
-# https://fashionai-web.onrender.com/auth.html (static web/auth.html for flutter_web_auth_2).
+# Auth0 (optional for webapp): create an SPA application; set Dashboard vars below.
+# Allowed Callback / Logout URLs: https://fashionai-web.onrender.com (and localhost for dev).
 
 services:
   - type: web
@@ -22,6 +21,9 @@ services:
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/health
+    buildFilter:
+      paths:
+        - backend/**
     envVars:
       - key: NODE_VERSION
         value: "22.12.0"
@@ -40,14 +42,31 @@ services:
 
   - type: web
     name: fashionai-web
-    branch: Webapp
-    runtime: docker
+    runtime: static
     plan: free
     region: oregon
-    dockerfilePath: ./Dockerfile.web
-    dockerContext: .
-    healthCheckPath: /
+    rootDir: webapp
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    buildFilter:
+      paths:
+        - webapp/**
     envVars:
-      # Passed as Docker build ARG (see Dockerfile.web) and at runtime.
-      - key: API_BASE_URL
+      # Baked into the Vite client at build time (must match your API + Auth0 app).
+      - key: VITE_API_BASE_URL
         value: https://fashionai-api-6w7k.onrender.com
+      - key: VITE_AUTH0_CALLBACK_URL
+        value: https://fashionai-web.onrender.com
+      - key: VITE_AUTH0_DOMAIN
+        sync: false
+      - key: VITE_AUTH0_CLIENT_ID
+        sync: false
+      - key: VITE_AUTH0_AUDIENCE
+        sync: false
+
+# Flutter web (Docker) is not part of this blueprint; use `Dockerfile.web` locally or
+# add a separate Render service if you still ship Flutter web builds.

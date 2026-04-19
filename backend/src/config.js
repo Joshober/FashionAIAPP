@@ -30,8 +30,6 @@ export function loadConfig() {
     mongodbUri: resolveMongoDbUri(),
     mongodbDbName: process.env.MONGODB_DB_NAME || undefined,
     allowedOrigins: originsRaw.split(',').map((s) => s.trim()).filter(Boolean),
-    auth0Domain: process.env.AUTH0_DOMAIN || '',
-    auth0Audience: process.env.AUTH0_AUDIENCE || '',
     jwtSecret: process.env.JWT_SECRET || '',
     mlServiceUrl: hfVit,
     mlVitServiceUrl: hfVit,

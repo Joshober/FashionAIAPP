@@ -3,8 +3,6 @@
  *   mongodbUri: string;
  *   mongodbDbName?: string;
  *   allowedOrigins: string[];
- *   auth0Domain: string;
- *   auth0Audience: string;
  *   jwtSecret: string;
  *   mlServiceUrl: string;
  *   mlVitServiceUrl: string;

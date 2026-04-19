@@ -31,7 +31,7 @@ export function authRouter(config) {
       const user = await User.create({ email: e, passwordHash });
 
       const sub = 'local:' + crypto.createHash('sha256').update(e).digest('hex').slice(0, 32);
-      const access_token = jwt.sign({ sub }, config.jwtSecret, {
+      const access_token = jwt.sign({ sub, email: e }, config.jwtSecret, {
         algorithm: 'HS256',
         expiresIn: '30d',
       });
@@ -64,7 +64,7 @@ export function authRouter(config) {
         if (!match) return res.status(401).json({ error: 'Invalid email or password' });
 
         const sub = 'local:' + crypto.createHash('sha256').update(e).digest('hex').slice(0, 32);
-        const access_token = jwt.sign({ sub }, config.jwtSecret, {
+        const access_token = jwt.sign({ sub, email: user.email }, config.jwtSecret, {
           algorithm: 'HS256',
           expiresIn: '30d',
         });
@@ -86,7 +86,7 @@ export function authRouter(config) {
     }
 
     const sub = 'local:' + crypto.createHash('sha256').update(e).digest('hex').slice(0, 32);
-    const access_token = jwt.sign({ sub }, config.jwtSecret, {
+    const access_token = jwt.sign({ sub, email: e }, config.jwtSecret, {
       algorithm: 'HS256',
       expiresIn: '30d',
     });
