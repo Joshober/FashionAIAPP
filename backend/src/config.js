@@ -1,6 +1,22 @@
 /** Hugging Face Space for ViT / classify (not configurable via env). */
 export const HF_VIT_SPACE_URL = 'https://alvaro05-vit-fashion-api.hf.space';
 
+const LOCAL_MONGO_DEFAULT = 'mongodb://127.0.0.1:27017/fashion_ai';
+
+function resolveMongoDbUri() {
+  const uri = (process.env.MONGODB_URI || '').trim();
+  if (uri) return uri;
+  const onRender = process.env.RENDER === 'true';
+  if (onRender) {
+    throw new Error(
+      'MONGODB_URI is not set. Render has no local MongoDB. In the Render Dashboard: ' +
+        'Environment → Environment Variables → add MONGODB_URI with your Atlas (or other) connection string, ' +
+        'e.g. mongodb+srv://USER:PASS@cluster.mongodb.net/fashion_ai?retryWrites=true&w=majority',
+    );
+  }
+  return LOCAL_MONGO_DEFAULT;
+}
+
 /**
  * @returns {import('./config.types.js').AppConfig}
  */
@@ -11,7 +27,7 @@ export function loadConfig() {
 
   return {
     port,
-    mongodbUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fashion_ai',
+    mongodbUri: resolveMongoDbUri(),
     mongodbDbName: process.env.MONGODB_DB_NAME || undefined,
     allowedOrigins: originsRaw.split(',').map((s) => s.trim()).filter(Boolean),
     auth0Domain: process.env.AUTH0_DOMAIN || '',
