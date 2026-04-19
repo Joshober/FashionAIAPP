@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Fashion AI uses the camera for the mirror feature.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Fashion AI uses the microphone for voice chat.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Fashion AI needs photo access to add garments from your library.</string>
 </dict>
 </plist>
