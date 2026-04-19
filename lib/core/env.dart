@@ -6,7 +6,7 @@ String envOrDefine(String key, {String defaultValue = ''}) {
   return defaultValue;
 }
 
-/// Resolved API base URL: `--dart-define=API_BASE_URL=...` overrides `.env`.
+/// `--dart-define=API_BASE_URL=...` overrides `.env` (e.g. Render `Dockerfile.web`).
 String apiBaseUrl() {
   const fromDefine = String.fromEnvironment('API_BASE_URL', defaultValue: '');
   if (fromDefine.isNotEmpty) return fromDefine;

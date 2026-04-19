@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +9,10 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: kIsWeb ? 'assets/env/dev.web.env' : 'assets/env/dev.env');
+  final envFile = kReleaseMode
+      ? 'assets/env/production.env'
+      : (kIsWeb ? 'assets/env/dev.web.env' : 'assets/env/dev.env');
+  await dotenv.load(fileName: envFile);
 
   final container = ProviderContainer();
   await container.read(authTokenProvider.notifier).restore();
