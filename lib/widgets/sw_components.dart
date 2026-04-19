@@ -315,6 +315,22 @@ String garmentFilterLabel(String tipo) {
       return 'Coat';
     case 'vestido':
       return 'Dress';
+    case 'accesorio':
+      return 'Accessory';
+    case 'bolso':
+      return 'Bag';
+    case 'joyeria':
+    case 'joyería':
+      return 'Jewelry';
+    case 'sombrero':
+      return 'Hat';
+    case 'cinturon':
+    case 'cinturón':
+      return 'Belt';
+    case 'gafas':
+      return 'Glasses';
+    case 'desconocido':
+      return 'Unknown';
     default:
       return tipo;
   }

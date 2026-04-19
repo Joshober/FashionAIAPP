@@ -88,6 +88,7 @@ export function prendasRouter(config) {
       await assertPrendaCap(req.userId);
       const {
         imagen_url,
+        imagen_base64,
         tipo,
         clase_nombre,
         color,
@@ -95,17 +96,32 @@ export function prendasRouter(config) {
         ocasion,
       } = req.body || {};
 
-      if (!imagen_url || typeof imagen_url !== 'string') {
-        return res.status(400).json({ error: 'imagen_url required' });
+      let finalImageUrl = '';
+      if (typeof imagen_url === 'string' && imagen_url.trim().length > 0) {
+        finalImageUrl = imagen_url.trim();
+      } else if (typeof imagen_base64 === 'string' && imagen_base64.trim().length > 0) {
+        const b64 = imagen_base64.includes(',') ? imagen_base64.split(',')[1] : imagen_base64;
+        const buffer = Buffer.from(b64, 'base64');
+        if (!buffer.length) {
+          return res.status(400).json({ error: 'Invalid imagen_base64 payload' });
+        }
+        const userDir = path.join(uploadsRoot(), req.userId);
+        fs.mkdirSync(userDir, { recursive: true });
+        const name = `auto-${Date.now()}-${Math.random().toString(16).slice(2)}.jpg`;
+        const diskPath = path.join(userDir, name);
+        await fs.promises.writeFile(diskPath, buffer);
+        finalImageUrl = `/uploads/${req.userId}/${name}`;
+      } else {
+        return res.status(400).json({ error: 'imagen_url or imagen_base64 required' });
       }
 
       const created = await Prenda.create({
         userId: req.userId,
-        imagen_url,
+        imagen_url: finalImageUrl,
         tipo: typeof tipo === 'string' ? tipo : 'superior',
-        clase_nombre: typeof clase_nombre === 'string' ? clase_nombre : '',
-        color: typeof color === 'string' ? color : '',
-        confianza: typeof confianza === 'number' ? confianza : 0,
+        clase_nombre: typeof clase_nombre === 'string' ? clase_nombre : 'desconocido',
+        color: typeof color === 'string' ? color : 'desconocido',
+        confianza: typeof confianza === 'number' ? confianza : Number.parseFloat(confianza) || 0,
         ocasion: Array.isArray(ocasion) ? ocasion.map(String) : [],
       });
       res.status(201).json(created.toObject());

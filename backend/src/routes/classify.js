@@ -25,9 +25,14 @@ export function classifyRouter(config) {
 
   r.post('/vit-base64', async (req, res, next) => {
     try {
-      const raw = req.body?.imagen || req.body?.image || req.body?.data;
+      const raw =
+        req.body?.imageDataUrl ||
+        req.body?.image_data_url ||
+        req.body?.imagen ||
+        req.body?.image ||
+        req.body?.data;
       if (typeof raw !== 'string') {
-        return res.status(400).json({ error: 'Expected JSON { imagen: base64 or data URL }' });
+        return res.status(400).json({ error: 'Expected JSON { imageDataUrl|imagen: base64 or data URL }' });
       }
       if (raw.length > config.maxVitBase64PayloadChars) {
         return res.status(413).json({ error: 'Payload too large' });

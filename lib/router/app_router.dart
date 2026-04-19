@@ -50,8 +50,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => OutfitDetailScreen(id: state.pathParameters['id']!),
           ),
           GoRoute(
+            path: '/prendas',
+            redirect: (_, __) => '/wardrobe',
+          ),
+          GoRoute(
             path: '/generate',
             builder: (context, state) => const GenerateScreen(),
+          ),
+          GoRoute(
+            path: '/outfits',
+            redirect: (_, __) => '/generate',
           ),
           GoRoute(
             path: '/generate/outfit',

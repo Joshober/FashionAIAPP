@@ -24,7 +24,18 @@ export function chatRouter(config) {
 
   r.post('/', async (req, res, next) => {
     try {
-      const message = typeof req.body?.message === 'string' ? req.body.message : req.body?.text;
+      const history = Array.isArray(req.body?.messages) ? req.body.messages : [];
+      const fromHistory = [...history].reverse().find(
+        (m) => m && typeof m === 'object' && m.role === 'user' && typeof m.content === 'string'
+      );
+      const historyMessage = fromHistory?.content;
+      const message =
+        typeof req.body?.message === 'string'
+          ? req.body.message
+          : (typeof req.body?.text === 'string'
+              ? req.body.text
+              : (typeof historyMessage === 'string' ? historyMessage : null));
+
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ error: 'message (string) required' });
       }
@@ -59,7 +70,7 @@ export function chatRouter(config) {
           ? parsed.outfitGeneration
           : null;
 
-      res.json({ reply, outfitGeneration });
+      res.json({ reply, outfitGeneration, message: { role: 'assistant', content: reply } });
     } catch (e) {
       next(e);
     }
@@ -67,9 +78,12 @@ export function chatRouter(config) {
 
   r.post('/transcribe', async (req, res, next) => {
     try {
-      const audioB64 = typeof req.body?.audio === 'string' ? req.body.audio : req.body?.wav;
+      const audioB64 =
+        typeof req.body?.audioBase64 === 'string'
+          ? req.body.audioBase64
+          : (typeof req.body?.audio === 'string' ? req.body.audio : req.body?.wav);
       if (!audioB64 || typeof audioB64 !== 'string') {
-        return res.status(400).json({ error: 'audio (base64 wav) required' });
+        return res.status(400).json({ error: 'audioBase64 (base64 wav) required' });
       }
       if (audioB64.length > config.maxAudioBase64Chars) {
         return res.status(413).json({ error: 'Audio payload too large' });
@@ -134,6 +148,8 @@ export function chatRouter(config) {
       res.json({
         format: config.openrouterTtsFormat,
         audio: audioBase64,
+        audioBase64,
+        mimeType: config.openrouterTtsFormat === 'wav' ? 'audio/wav' : `audio/${config.openrouterTtsFormat}`,
       });
     } catch (e) {
       next(e);

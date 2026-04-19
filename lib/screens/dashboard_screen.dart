@@ -6,6 +6,7 @@ import '../core/media_url.dart';
 import '../providers/api_base.dart';
 import '../providers/repositories.dart';
 import '../theme/app_theme.dart';
+import '../utils/classification_display.dart';
 import '../utils/outfit_visuals.dart';
 import '../widgets/marquee_strip.dart';
 import '../widgets/prenda_tile_card.dart';
@@ -161,11 +162,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 final id = p['_id']?.toString() ?? '';
                                 final url = resolveMediaUrl(base, p['imagen_url']?.toString());
                                 final tipo = p['tipo']?.toString() ?? '';
-                                final cls = p['clase_nombre']?.toString() ?? '';
-                                final occ = (p['ocasion'] as List?)?.take(2).join(', ') ?? '';
+                                final clsRaw = p['clase_nombre']?.toString() ?? '';
+                                final cls = clsRaw.toLowerCase() == 'desconocido'
+                                    ? (typeToEnglish(tipo).isEmpty ? 'Unknown' : typeToEnglish(tipo))
+                                    : garmentClassLabel(clsRaw);
+                                final occ = formatOccasionsEnglish(p['ocasion']);
                                 return PrendaTileCard(
                                   imageUrl: url,
-                                  category: tipo.isEmpty ? 'Garment' : garmentFilterLabel(tipo),
+                                  category: typeToEnglish(tipo).isEmpty ? 'Unknown' : typeToEnglish(tipo),
                                   subtitle: '$cls · $occ',
                                   onTap: () => context.go('/wardrobe/prenda/$id'),
                                 );

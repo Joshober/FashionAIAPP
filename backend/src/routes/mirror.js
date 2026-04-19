@@ -12,7 +12,10 @@ export function mirrorRouter(config) {
 
   r.post('/analyze', async (req, res, next) => {
     try {
-      const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt : '';
+      const prompt =
+        typeof req.body?.userPrompt === 'string'
+          ? req.body.userPrompt
+          : (typeof req.body?.prompt === 'string' ? req.body.prompt : '');
       if (!prompt.trim()) return res.status(400).json({ error: 'prompt required' });
 
       const data = await openrouterChat(config, {
@@ -40,13 +43,20 @@ export function mirrorRouter(config) {
 
   r.post('/analyze-frame', async (req, res, next) => {
     try {
-      const frame = typeof req.body?.frame === 'string' ? req.body.frame : '';
+      const frame =
+        typeof req.body?.imageDataUrl === 'string'
+          ? req.body.imageDataUrl
+          : (typeof req.body?.image_data_url === 'string'
+              ? req.body.image_data_url
+              : (typeof req.body?.frame === 'string' ? req.body.frame : ''));
       const context = req.body?.context && typeof req.body.context === 'object' ? req.body.context : {};
+      const userNotes = typeof req.body?.userNotes === 'string' ? req.body.userNotes : '';
       if (!isAllowedMirrorImageRef(frame)) {
         return res.status(400).json({ error: 'frame must be a data URL (jpeg/png/webp base64)' });
       }
 
       const ctxText = JSON.stringify(context).slice(0, 4000);
+      const notesText = userNotes.trim().slice(0, 1000);
       const data = await openrouterChat(config, {
         model: config.openrouterModel,
         response_format: { type: 'json_object' },
@@ -55,7 +65,12 @@ export function mirrorRouter(config) {
           {
             role: 'user',
             content: [
-              { type: 'text', text: `Context JSON: ${ctxText}\nEvaluate the outfit in the image.` },
+              {
+                type: 'text',
+                text: `Context JSON: ${ctxText}\n${
+                  notesText ? `User notes: ${notesText}\n` : ''
+                }Evaluate the outfit in the image.`,
+              },
               { type: 'image_url', image_url: { url: frame } },
             ],
           },

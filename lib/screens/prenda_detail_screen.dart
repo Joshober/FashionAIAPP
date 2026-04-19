@@ -6,6 +6,7 @@ import '../core/media_url.dart';
 import '../providers/api_base.dart';
 import '../providers/repositories.dart';
 import '../theme/app_theme.dart';
+import '../utils/classification_display.dart';
 import '../widgets/sw_components.dart';
 
 class PrendaDetailScreen extends ConsumerStatefulWidget {
@@ -98,6 +99,18 @@ class _PrendaDetailScreenState extends ConsumerState<PrendaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final base = ref.watch(apiBaseUrlProvider);
+    final tipoRaw = _p?['tipo']?.toString() ?? '';
+    final claseRaw = _p?['clase_nombre']?.toString() ?? '';
+    final colorRaw = _p?['color']?.toString() ?? '';
+    final titleName = claseRaw.isNotEmpty && claseRaw.toLowerCase() != 'desconocido'
+        ? garmentClassLabel(claseRaw)
+        : (typeToEnglish(tipoRaw).isEmpty ? 'Unknown' : typeToEnglish(tipoRaw));
+    final typeDisplay = typeToEnglish(tipoRaw).isEmpty ? '\u2014' : typeToEnglish(tipoRaw);
+    final colorDisplay = colorRaw.isNotEmpty && colorRaw.toLowerCase() != 'desconocido'
+        ? colorToEnglish(colorRaw)
+        : '';
+    final occasionDisplay = formatOccasionsEnglish(_p?['ocasion']);
+
     return Scaffold(
       backgroundColor: SwColors.white,
       appBar: AppBar(
@@ -137,16 +150,16 @@ class _PrendaDetailScreenState extends ConsumerState<PrendaDetailScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${_p!['tipo']}',
+                                        titleName,
                                         style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                                       ),
                                       const SizedBox(height: 6),
-                                      Text('Class: ${_p!['clase_nombre']}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                                      if ((_p!['color']?.toString() ?? '').isNotEmpty)
-                                        Text('Color: ${_p!['color']}', style: const TextStyle(color: SwColors.gray, fontWeight: FontWeight.w600)),
+                                      Text('Type: $typeDisplay', style: const TextStyle(fontWeight: FontWeight.w600)),
+                                      if (colorDisplay.isNotEmpty)
+                                        Text('Color: $colorDisplay', style: const TextStyle(color: SwColors.gray, fontWeight: FontWeight.w600)),
                                       const SizedBox(height: 6),
                                       Text(
-                                        'Occasions: ${(_p!['ocasion'] as List?)?.join(', ') ?? ''}',
+                                        'Occasion: $occasionDisplay',
                                         style: const TextStyle(color: SwColors.gray, fontWeight: FontWeight.w600),
                                       ),
                                       const SizedBox(height: 16),

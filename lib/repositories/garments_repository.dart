@@ -43,7 +43,12 @@ class GarmentsRepository {
   Future<Map<String, dynamic>> classifyVitBase64(String dataUrlOrB64) async {
     final r = await _dio.post<Map<String, dynamic>>(
       '/api/classify/vit-base64',
-      data: {'imagen': dataUrlOrB64},
+      data: {
+        // Web parity payload
+        'imageDataUrl': dataUrlOrB64,
+        // Backward compatibility with older backend variants.
+        'imagen': dataUrlOrB64,
+      },
     );
     return Map<String, dynamic>.from(r.data!);
   }
