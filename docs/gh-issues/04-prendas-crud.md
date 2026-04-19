@@ -12,7 +12,7 @@ Implement **Prendas** CRUD with an upload pipeline: accept image uploads (e.g. M
 
 ## References
 
-- Builds on [03-classify-hf.md](./03-classify-hf.md) and [02-mongo-auth.md](./02-mongo-auth.md).
+- Builds on [03-classify-hf.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/03-classify-hf.md) and [02-mongo-auth.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/02-mongo-auth.md).
 
 ## Dependencies
 
