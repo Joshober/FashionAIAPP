@@ -1,8 +1,7 @@
 # Flutter web → nginx. Render sets API_BASE_URL as env (also available as build ARG).
 ARG API_BASE_URL=https://fashionai-api.onrender.com
-# Must satisfy Dart SDK in pubspec (see pubspec.lock sdks). Pin a tag from:
-# https://github.com/cirruslabs/docker-images-flutter/pkgs/container/flutter
-FROM ghcr.io/cirruslabs/flutter:3.35.0 AS build
+# Use `stable` so Render always pulls a published SDK (pin a version tag if you need reproducibility).
+FROM ghcr.io/cirruslabs/flutter:stable AS build
 ARG API_BASE_URL
 WORKDIR /app
 COPY pubspec.yaml pubspec.lock ./

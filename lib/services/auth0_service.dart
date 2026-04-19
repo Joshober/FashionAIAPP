@@ -35,11 +35,10 @@ class Auth0Service {
   String _redirectUri() {
     final explicit = envOrDefine('AUTH0_REDIRECT_URI').trim();
     if (explicit.isNotEmpty) return explicit;
-    if (kIsWeb) return '${Uri.base.origin}/auth-callback';
+    // Web: static page required by flutter_web_auth_2 (see web/auth.html).
+    if (kIsWeb) return '${Uri.base.origin}/auth.html';
     return 'fashionai.app.auth0://auth-callback';
   }
-
-  String _callbackScheme() => Uri.parse(_redirectUri()).scheme;
 
   static String _pkceChallenge(String verifier) {
     final digest = sha256.convert(utf8.encode(verifier));
@@ -69,9 +68,21 @@ class Auth0Service {
       if (_audience.isNotEmpty) 'audience': _audience,
     });
 
+    final cb = Uri.parse(redirectUri);
+    final FlutterWebAuth2Options options;
+    if (cb.scheme == 'https') {
+      options = FlutterWebAuth2Options(
+        httpsHost: cb.host,
+        httpsPath: cb.path.isEmpty ? '/' : cb.path,
+      );
+    } else {
+      options = const FlutterWebAuth2Options();
+    }
+
     final result = await FlutterWebAuth2.authenticate(
       url: authUri.toString(),
-      callbackUrlScheme: _callbackScheme(),
+      callbackUrlScheme: cb.scheme,
+      options: options,
     );
 
     final returned = Uri.parse(result);
