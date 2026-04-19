@@ -14,8 +14,8 @@ Implement garment classification by proxying the configured Hugging Face Space o
 ## References
 
 - HF outbound calls use server-side keys only (never in Flutter).
-- Contract row for HF in roadmap: document in `backend/README.md` or [docs/CONTRACTS.md](../CONTRACTS.md).
+- Contract row for HF in roadmap: document in `backend/README.md` or [docs/CONTRACTS.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/CONTRACTS.md).
 
 ## Dependencies
 
-Requires backend skeleton; Mongo models optional for classify-only routes but typically follows [02-mongo-auth.md](./02-mongo-auth.md) for persistence integration.
+Requires backend skeleton; Mongo models optional for classify-only routes but typically follows [02-mongo-auth.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/02-mongo-auth.md) for persistence integration.
