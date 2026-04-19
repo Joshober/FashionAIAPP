@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { authMiddleware } from './middleware/auth.js';
+import { authRouter } from './routes/auth.js';
 import { healthRouter } from './routes/health.js';
 import { classifyRouter } from './routes/classify.js';
 import { prendasRouter } from './routes/prendas.js';
@@ -40,6 +41,8 @@ export function createApp(config) {
 
   app.use(express.json({ limit: '15mb' }));
   app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+
+  app.use('/api/auth', authRouter(config));
 
   const uploadsDir = path.join(__dirname, '..', 'uploads');
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });

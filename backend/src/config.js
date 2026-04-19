@@ -12,6 +12,7 @@ export function loadConfig() {
     allowedOrigins: originsRaw.split(',').map((s) => s.trim()).filter(Boolean),
     auth0Domain: process.env.AUTH0_DOMAIN || '',
     auth0Audience: process.env.AUTH0_AUDIENCE || '',
+    jwtSecret: process.env.JWT_SECRET || '',
     mlServiceUrl: (process.env.ML_SERVICE_URL || process.env.ML_VIT_SERVICE_URL || 'https://alvaro05-vit-fashion-api.hf.space').replace(/\/$/, ''),
     mlVitServiceUrl: (process.env.ML_VIT_SERVICE_URL || process.env.ML_SERVICE_URL || 'https://alvaro05-vit-fashion-api.hf.space').replace(/\/$/, ''),
     openrouterApiKey: process.env.OPENROUTER_API_KEY || '',

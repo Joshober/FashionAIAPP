@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers/auth_token.dart';
 import 'router/app_router.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,13 +31,7 @@ class FashionAIApp extends ConsumerWidget {
       routerConfig: router,
       title: 'Fashion AI',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3D2C4D),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
+      theme: buildFashionAiTheme(),
     );
   }
 }

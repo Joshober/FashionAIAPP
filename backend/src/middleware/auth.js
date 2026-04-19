@@ -22,9 +22,37 @@ export function authMiddleware(config) {
     const token = header.slice(7).trim();
     if (!token) return next();
 
-    if (!client || !config.auth0Audience) {
+    if (client && config.auth0Audience) {
+      function getKey(header, cb) {
+        client.getSigningKey(header.kid, (err, key) => {
+          if (err) return cb(err);
+          const signingKey = key?.getPublicKey();
+          cb(null, signingKey);
+        });
+      }
+
+      jwt.verify(
+        token,
+        getKey,
+        {
+          audience: config.auth0Audience,
+          issuer: [`https://${config.auth0Domain}/`, `https://${config.auth0Domain}`],
+          algorithms: ['RS256'],
+        },
+        (err, decoded) => {
+          if (!err && decoded && typeof decoded.sub === 'string') {
+            req.userId = decoded.sub;
+            req.auth = { sub: decoded.sub };
+          }
+          next();
+        }
+      );
+      return;
+    }
+
+    if (config.jwtSecret) {
       try {
-        const decoded = jwt.decode(token);
+        const decoded = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'] });
         if (decoded && typeof decoded.sub === 'string') {
           req.userId = decoded.sub;
           req.auth = { sub: decoded.sub };
@@ -35,29 +63,15 @@ export function authMiddleware(config) {
       return next();
     }
 
-    function getKey(header, cb) {
-      client.getSigningKey(header.kid, (err, key) => {
-        if (err) return cb(err);
-        const signingKey = key?.getPublicKey();
-        cb(null, signingKey);
-      });
-    }
-
-    jwt.verify(
-      token,
-      getKey,
-      {
-        audience: config.auth0Audience,
-        issuer: [`https://${config.auth0Domain}/`, `https://${config.auth0Domain}`],
-        algorithms: ['RS256'],
-      },
-      (err, decoded) => {
-        if (!err && decoded && typeof decoded.sub === 'string') {
-          req.userId = decoded.sub;
-          req.auth = { sub: decoded.sub };
-        }
-        next();
+    try {
+      const decoded = jwt.decode(token);
+      if (decoded && typeof decoded.sub === 'string') {
+        req.userId = decoded.sub;
+        req.auth = { sub: decoded.sub };
       }
-    );
+    } catch {
+      /* ignore */
+    }
+    next();
   };
 }

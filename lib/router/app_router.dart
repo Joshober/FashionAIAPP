@@ -13,39 +13,41 @@ import '../screens/prenda_detail_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/wardrobe_outfits_screen.dart';
 import '../screens/wardrobe_screen.dart';
+import '../widgets/tubelight_shell.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const DashboardScreen(),
-      ),
-      GoRoute(
-        path: '/wardrobe',
-        builder: (context, state) => const WardrobeScreen(),
+      ShellRoute(
+        builder: (context, state, child) => TubelightShell(child: child),
         routes: [
           GoRoute(
-            path: 'outfits',
+            path: '/',
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/wardrobe',
+            builder: (context, state) => const WardrobeScreen(),
+          ),
+          GoRoute(
+            path: '/wardrobe/outfits',
             builder: (context, state) => const WardrobeOutfitsScreen(),
           ),
           GoRoute(
-            path: 'prenda/:id',
+            path: '/wardrobe/prenda/:id',
             builder: (context, state) => PrendaDetailScreen(id: state.pathParameters['id']!),
           ),
           GoRoute(
-            path: 'outfit/:id',
+            path: '/wardrobe/outfit/:id',
             builder: (context, state) => OutfitDetailScreen(id: state.pathParameters['id']!),
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/generate',
-        builder: (context, state) => const GenerateScreen(),
-        routes: [
           GoRoute(
-            path: 'outfit',
+            path: '/generate',
+            builder: (context, state) => const GenerateScreen(),
+          ),
+          GoRoute(
+            path: '/generate/outfit',
             builder: (context, state) {
               final extra = state.extra;
               Map<String, dynamic>? map;
@@ -57,29 +59,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               return GenerateOutfitDetailScreen(outfit: map);
             },
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/chat',
-        builder: (context, state) => const ChatScreen(),
-      ),
-      GoRoute(
-        path: '/mirror',
-        builder: (context, state) => const MirrorScreen(),
-        routes: [
           GoRoute(
-            path: 'context',
+            path: '/chat',
+            builder: (context, state) => const ChatScreen(),
+          ),
+          GoRoute(
+            path: '/mirror',
+            builder: (context, state) => const MirrorScreen(),
+          ),
+          GoRoute(
+            path: '/mirror/context',
             builder: (context, state) => const MirrorContextScreen(),
           ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
+          ),
+          GoRoute(
+            path: '/modelo/ejemplos',
+            builder: (context, state) => const ModelExamplesScreen(),
+          ),
         ],
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-      ),
-      GoRoute(
-        path: '/modelo/ejemplos',
-        builder: (context, state) => const ModelExamplesScreen(),
       ),
     ],
   );

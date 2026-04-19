@@ -5,7 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../core/media_url.dart';
 import '../providers/api_base.dart';
 import '../providers/repositories.dart';
-import '../widgets/app_drawer.dart';
+import '../theme/app_theme.dart';
+import '../utils/outfit_visuals.dart';
+import '../widgets/marquee_strip.dart';
+import '../widgets/prenda_tile_card.dart';
+import '../widgets/saved_outfit_grid_card.dart';
+import '../widgets/sw_components.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -19,6 +24,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<Map<String, dynamic>> _prendas = [];
   List<Map<String, dynamic>> _outfits = [];
   String? _error;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -29,6 +35,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Future<void> _load() async {
     setState(() {
       _error = null;
+      _loading = true;
     });
     final health = ref.read(healthRepositoryProvider);
     final garments = ref.read(garmentsRepositoryProvider);
@@ -39,6 +46,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         _apiOk = false;
         _prendas = [];
         _outfits = [];
+        _loading = false;
       });
       return;
     }
@@ -47,116 +55,360 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       final o = await outfits.list();
       setState(() {
         _apiOk = true;
-        _prendas = p.take(6).toList();
-        _outfits = o.take(6).toList();
+        _prendas = p.take(8).toList();
+        _outfits = o.take(8).toList();
+        _loading = false;
       });
     } catch (e) {
       setState(() {
         _apiOk = true;
         _error = e.toString();
+        _loading = false;
       });
     }
+  }
+
+  int _gridColumns(double w) {
+    if (w >= 1100) return 4;
+    if (w >= 720) return 3;
+    return 2;
   }
 
   @override
   Widget build(BuildContext context) {
     final base = ref.watch(apiBaseUrlProvider);
+    final mq = MediaQuery.sizeOf(context);
+    final cols = _gridColumns(mq.width);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          IconButton(onPressed: _load, icon: const Icon(Icons.refresh)),
-        ],
-      ),
-      drawer: const AppDrawer(),
+      backgroundColor: SwColors.white,
       body: RefreshIndicator(
+        color: SwColors.accent,
         onRefresh: _load,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            if (_apiOk == false)
-              const Card(
-                child: ListTile(
-                  leading: Icon(Icons.cloud_off),
-                  title: Text('API unreachable'),
-                  subtitle: Text('Check backend and API_BASE_URL in assets/env/dev.env'),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: SwPageContainer(
+                child: _HeroBlock(
+                  onUpload: () => context.go('/wardrobe'),
+                  onGenerate: () => context.go('/generate'),
                 ),
               ),
-            if (_error != null) Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilledButton.icon(
-                  onPressed: () => context.go('/wardrobe'),
-                  icon: const Icon(Icons.add_photo_alternate_outlined),
-                  label: const Text('Wardrobe'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => context.go('/generate'),
-                  icon: const Icon(Icons.auto_awesome),
-                  label: const Text('Generate'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => context.go('/chat'),
-                  icon: const Icon(Icons.chat),
-                  label: const Text('Chat'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => context.go('/mirror'),
-                  icon: const Icon(Icons.camera_front),
-                  label: const Text('Mirror'),
-                ),
-              ],
             ),
-            const SizedBox(height: 24),
-            Text('Recent garments', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            if (_prendas.isEmpty && _apiOk == true)
-              const Text('No garments yet.')
-            else
-              SizedBox(
-                height: 120,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _prendas.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (context, i) {
-                    final p = _prendas[i];
-                    final id = p['_id']?.toString() ?? '';
-                    final url = resolveMediaUrl(base, p['imagen_url']?.toString());
-                    return GestureDetector(
-                      onTap: () => context.go('/wardrobe/prenda/$id'),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: url.isEmpty
-                              ? Container(color: Colors.grey.shade300)
-                              : Image.network(url, fit: BoxFit.cover),
+            const SliverToBoxAdapter(child: MarqueeStrip()),
+            SliverToBoxAdapter(
+              child: SwPageContainer(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 22, 16, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (_apiOk == false)
+                        SwCard(
+                          padding: const EdgeInsets.all(14),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.cloud_off_outlined, color: SwColors.accent),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'API unreachable. Check backend and API_BASE_URL in assets/env/dev.env',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      if (_error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(_error!, style: const TextStyle(color: SwColors.accent, fontWeight: FontWeight.w600)),
+                        ),
+                      SwSectionRow(
+                        title: 'Recent garments',
+                        actionLabel: 'View all',
+                        onAction: () => context.go('/wardrobe'),
                       ),
-                    );
-                  },
+                      if (_loading)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else if (_prendas.isEmpty && _apiOk == true)
+                        SwEmptyState(
+                          title: 'Upload first',
+                          subtitle: 'Add garments to populate your wardrobe.',
+                          actionLabel: 'Open wardrobe',
+                          onAction: () => context.go('/wardrobe'),
+                        )
+                      else
+                        LayoutBuilder(
+                          builder: (context, c) {
+                            final cross = _gridColumns(c.maxWidth);
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _prendas.length,
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: cross,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 4 / 5.2,
+                              ),
+                              itemBuilder: (context, i) {
+                                final p = _prendas[i];
+                                final id = p['_id']?.toString() ?? '';
+                                final url = resolveMediaUrl(base, p['imagen_url']?.toString());
+                                final tipo = p['tipo']?.toString() ?? '';
+                                final cls = p['clase_nombre']?.toString() ?? '';
+                                final occ = (p['ocasion'] as List?)?.take(2).join(', ') ?? '';
+                                return PrendaTileCard(
+                                  imageUrl: url,
+                                  category: tipo.isEmpty ? 'Garment' : garmentFilterLabel(tipo),
+                                  subtitle: '$cls · $occ',
+                                  onTap: () => context.go('/wardrobe/prenda/$id'),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      const SizedBox(height: 28),
+                      SwSectionRow(
+                        title: 'Saved outfits',
+                        actionLabel: 'View all',
+                        onAction: () => context.go('/wardrobe/outfits'),
+                      ),
+                      if (_loading)
+                        const SizedBox.shrink()
+                      else if (_outfits.isEmpty && _apiOk == true)
+                        SwEmptyState(
+                          title: 'Generate outfits',
+                          subtitle: 'Create looks from your wardrobe.',
+                          actionLabel: 'Generate',
+                          onAction: () => context.go('/generate'),
+                        )
+                      else
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _outfits.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: cols,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.92,
+                          ),
+                          itemBuilder: (context, i) {
+                            final o = _outfits[i];
+                            final id = o['_id']?.toString() ?? '';
+                            final urls = outfitImageUrls(base, o);
+                            return SavedOutfitGridCard(
+                              imageUrls: urls,
+                              scoreLabel: 'Score ${o['puntuacion'] ?? '—'}',
+                              onTap: () => context.go('/wardrobe/outfit/$id'),
+                            );
+                          },
+                        ),
+                      const SizedBox(height: 28),
+                    ],
+                  ),
                 ),
               ),
-            const SizedBox(height: 24),
-            Text('Recent outfits', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            if (_outfits.isEmpty && _apiOk == true)
-              const Text('No saved outfits yet.')
-            else
-              ..._outfits.map((o) {
-                final id = o['_id']?.toString() ?? '';
-                return ListTile(
-                  leading: const Icon(Icons.layers),
-                  title: Text('Outfit · score ${o['puntuacion'] ?? '-'}'),
-                  onTap: () => context.go('/wardrobe/outfit/$id'),
-                );
-              }),
+            ),
+            SliverToBoxAdapter(
+              child: Container(
+                width: double.infinity,
+                color: SwColors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+                child: SwPageContainer(
+                  child: LayoutBuilder(
+                    builder: (context, c) {
+                      final wide = c.maxWidth >= 720;
+                      final row = Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                SwLabel('Live mirror', color: SwColors.accent),
+                                SizedBox(height: 8),
+                                Text(
+                                  'TRY YOUR OUTFIT LIVE',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 22,
+                                    letterSpacing: 0.6,
+                                    height: 1.05,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Real-time feedback with camera + AI.',
+                                  style: TextStyle(color: SwColors.gray, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (wide) const SizedBox(width: 16),
+                          if (wide)
+                            FilledButton(
+                              onPressed: () => context.go('/mirror'),
+                              child: const Text('OPEN MIRROR'),
+                            ),
+                        ],
+                      );
+                      if (!wide) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            row,
+                            const SizedBox(height: 14),
+                            FilledButton(
+                              onPressed: () => context.go('/mirror'),
+                              child: const Text('OPEN MIRROR'),
+                            ),
+                          ],
+                        );
+                      }
+                      return row;
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _HeroBlock extends StatelessWidget {
+  const _HeroBlock({required this.onUpload, required this.onGenerate});
+
+  final VoidCallback onUpload;
+  final VoidCallback onGenerate;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, c) {
+        final wide = c.maxWidth >= 900;
+        final h = wide ? 320.0 : 260.0;
+        return SizedBox(
+          height: h,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      SwColors.light,
+                      SwColors.white,
+                      SwColors.accent.withValues(alpha: 0.12),
+                    ],
+                  ),
+                ),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      SwColors.black.withValues(alpha: 0.55),
+                      SwColors.black.withValues(alpha: 0.05),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                child: wide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(child: _HeroCopy(onUpload: onUpload, onGenerate: onGenerate, light: true)),
+                          const SizedBox(width: 24),
+                          const Expanded(
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: Text(
+                                'Curated looks.\nConfident dressing.',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.15,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : _HeroCopy(onUpload: onUpload, onGenerate: onGenerate, light: true),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HeroCopy extends StatelessWidget {
+  const _HeroCopy({required this.onUpload, required this.onGenerate, required this.light});
+
+  final VoidCallback onUpload;
+  final VoidCallback onGenerate;
+  final bool light;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = light ? Colors.white : SwColors.black;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        SwLabel('Fashion AI', color: SwColors.accent),
+        const SizedBox(height: 10),
+        Text(
+          'DRESS\nWITH\nINTENT',
+          style: TextStyle(
+            color: fg,
+            fontWeight: FontWeight.w900,
+            height: 0.9,
+            letterSpacing: -1,
+            fontSize: 38,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            FilledButton(
+              onPressed: onUpload,
+              child: const Text('UPLOAD GARMENT'),
+            ),
+            OutlinedButton(
+              onPressed: onGenerate,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: Colors.white, width: 1.5),
+              ),
+              child: const Text('GENERATE OUTFITS'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

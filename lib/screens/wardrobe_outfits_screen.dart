@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/api_base.dart';
 import '../providers/repositories.dart';
-import '../widgets/app_drawer.dart';
+import '../theme/app_theme.dart';
+import '../utils/outfit_visuals.dart';
+import '../widgets/saved_outfit_grid_card.dart';
+import '../widgets/sw_components.dart';
+import '../widgets/wardrobe_sub_nav.dart';
 
 class WardrobeOutfitsScreen extends ConsumerStatefulWidget {
   const WardrobeOutfitsScreen({super.key});
@@ -41,8 +46,8 @@ class _WardrobeOutfitsScreenState extends ConsumerState<WardrobeOutfitsScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Delete outfit?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('DELETE')),
         ],
       ),
     );
@@ -51,33 +56,103 @@ class _WardrobeOutfitsScreenState extends ConsumerState<WardrobeOutfitsScreen> {
     await _load();
   }
 
+  int _cols(double w) {
+    if (w >= 1100) return 4;
+    if (w >= 720) return 3;
+    return 2;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final base = ref.watch(apiBaseUrlProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Saved outfits'),
-        actions: [IconButton(onPressed: _load, icon: const Icon(Icons.refresh))],
-      ),
-      drawer: const AppDrawer(),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _items.length,
-              itemBuilder: (context, i) {
-                final o = _items[i];
-                final id = o['_id']?.toString() ?? '';
-                return ListTile(
-                  leading: const Icon(Icons.layers_outlined),
-                  title: Text('Score: ${o['puntuacion'] ?? '-'}'),
-                  subtitle: Text(id),
-                  onTap: () => context.go('/wardrobe/outfit/$id'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () => _delete(id),
+      backgroundColor: SwColors.white,
+      body: RefreshIndicator(
+        color: SwColors.accent,
+        onRefresh: _load,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: SwPageContainer(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          const Expanded(child: SwHeading('Saved outfits')),
+                          TextButton(
+                            onPressed: () => context.go('/generate'),
+                            child: const Text('GENERATE', style: TextStyle(fontWeight: FontWeight.w900)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      const WardrobeSubNav(garmentsSelected: false),
+                    ],
                   ),
-                );
-              },
+                ),
+              ),
             ),
+            if (_loading)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_items.isEmpty)
+              SliverToBoxAdapter(
+                child: SwPageContainer(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SwEmptyState(
+                      title: 'No saved outfits',
+                      subtitle: 'Generate suggestions and save your favorites.',
+                      actionLabel: 'Go to generate',
+                      onAction: () => context.go('/generate'),
+                    ),
+                  ),
+                ),
+              )
+            else
+              SliverToBoxAdapter(
+                child: SwPageContainer(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    child: LayoutBuilder(
+                      builder: (context, c) {
+                        final cross = _cols(c.maxWidth);
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _items.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: cross,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.92,
+                          ),
+                          itemBuilder: (context, i) {
+                            final o = _items[i];
+                            final id = o['_id']?.toString() ?? '';
+                            final urls = outfitImageUrls(base, o);
+                            return SavedOutfitGridCard(
+                              imageUrls: urls,
+                              scoreLabel: 'Score ${o['puntuacion'] ?? '—'}',
+                              onTap: () => context.go('/wardrobe/outfit/$id'),
+                              onDelete: () => _delete(id),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
