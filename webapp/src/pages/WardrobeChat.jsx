@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import { Mic, Send, Sparkles, Volume2, VolumeX } from 'lucide-react'
-import { getRedirectOrigin } from '../utils/auth0Redirect'
+import { useAuth } from '../context/AuthContext'
 import SavedOutfitGridCard from '../components/SavedOutfitGridCard'
 import { outfitRecommendUrl } from '../lib/outfitRecommendQuery'
 import { buildSaveOutfitPayload, getComboKey } from '../utils/outfitHelpers'
@@ -45,7 +44,7 @@ function stripOutfitMarkersForDisplay(text) {
 }
 
 export default function WardrobeChat() {
-  const { isAuthenticated, isLoading: authLoading, loginWithRedirect } = useAuth0()
+  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [messages, setMessages] = useState([WELCOME])
   const [input, setInput] = useState('')
@@ -349,14 +348,6 @@ export default function WardrobeChat() {
     }
   }, [])
 
-  if (authLoading) {
-    return (
-      <div className="min-h-dvh sw-light flex items-center justify-center" style={{ background: 'var(--sw-white)' }}>
-        <p className="sw-label text-[#888]">Loading…</p>
-      </div>
-    )
-  }
-
   if (!isAuthenticated) {
     return (
       <div className="min-h-dvh sw-light" style={{ background: 'var(--sw-white)' }}>
@@ -365,11 +356,7 @@ export default function WardrobeChat() {
             <p className="sw-label text-[#FF3B00] mb-2">— CHAT</p>
             <h1 className="sw-display text-2xl sm:text-3xl mb-4">Wardrobe assistant</h1>
             <p className="text-[#555] mb-8">Sign in to chat and get recommendations based on your garments.</p>
-            <button
-              type="button"
-              onClick={() => loginWithRedirect({ authorizationParams: { redirect_uri: getRedirectOrigin() } })}
-              className="sw-btn sw-btn-primary sw-btn-lg"
-            >
+            <button type="button" onClick={() => navigate('/login')} className="sw-btn sw-btn-primary sw-btn-lg">
               Sign in
             </button>
           </div>

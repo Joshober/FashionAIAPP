@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import {
   Camera,
@@ -19,13 +19,12 @@ import {
 import { OCCASION_OPTIONS } from '../lib/mirrorConstants'
 import { loadMirrorContext, saveMirrorContext } from '../lib/mirrorContextStorage'
 import { buildMirrorWeatherPartialFromCoords, GEO_OPTIONS_DEFAULT } from '../lib/mirrorWeather'
-import { getRedirectOrigin } from '../utils/auth0Redirect'
 import { typeToEnglish, colorToEnglish, garmentClassLabel } from '../lib/classificationDisplay'
 
 export default function Mirror() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { isAuthenticated, loginWithRedirect } = useAuth0()
+  const { isAuthenticated } = useAuth()
 
   const videoRef = useRef(null)
   const streamRef = useRef(null)
@@ -241,7 +240,7 @@ export default function Mirror() {
    */
   const handleClassifyAndAskStylist = async () => {
     if (!isAuthenticated) {
-      loginWithRedirect({ authorizationParams: { redirect_uri: getRedirectOrigin() } })
+      navigate('/login', { state: { from: location } })
       return
     }
     setError(null)
