@@ -15,6 +15,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+gh auth status *> $null
+if ($LASTEXITCODE -ne 0) {
+  Write-Error "GitHub CLI is not authenticated. Run ``gh auth login`` or set GH_TOKEN, then re-run this script."
+  exit 1
+}
+
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $IssuesDir = Join-Path $RepoRoot "docs/gh-issues"
 
