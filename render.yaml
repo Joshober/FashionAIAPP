@@ -50,4 +50,4 @@ services:
     envVars:
       # Passed as Docker build ARG (see Dockerfile.web) and at runtime.
       - key: API_BASE_URL
-        value: https://fashionai-api.onrender.com
+        value: https://fashionai-api-6w7k.onrender.com

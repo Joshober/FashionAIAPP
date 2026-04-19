@@ -1,5 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+/// Production API (Render). Override with `assets/env/*.env` or `--dart-define=API_BASE_URL=...` for local dev.
+const String kDefaultApiBaseUrl = 'https://fashionai-api-6w7k.onrender.com';
+
 String envOrDefine(String key, {String defaultValue = ''}) {
   final v = dotenv.env[key];
   if (v != null && v.isNotEmpty) return v;
@@ -10,5 +13,5 @@ String envOrDefine(String key, {String defaultValue = ''}) {
 String apiBaseUrl() {
   const fromDefine = String.fromEnvironment('API_BASE_URL', defaultValue: '');
   if (fromDefine.isNotEmpty) return fromDefine;
-  return envOrDefine('API_BASE_URL', defaultValue: 'http://127.0.0.1:4000');
+  return envOrDefine('API_BASE_URL', defaultValue: kDefaultApiBaseUrl);
 }

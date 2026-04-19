@@ -1,5 +1,5 @@
 # Flutter web → nginx. Render sets API_BASE_URL as env (also available as build ARG).
-ARG API_BASE_URL=https://fashionai-api.onrender.com
+ARG API_BASE_URL=https://fashionai-api-6w7k.onrender.com
 # Use `stable` so Render always pulls a published SDK (pin a version tag if you need reproducibility).
 FROM ghcr.io/cirruslabs/flutter:stable AS build
 ARG API_BASE_URL

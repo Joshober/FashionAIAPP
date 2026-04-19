@@ -1,6 +1,6 @@
 # HTTP API contracts
 
-Base URL: the Flutter app sets `API_BASE_URL` (e.g. `http://10.0.2.2:4000`). All paths below are relative to that origin.
+Base URL: the Flutter app sets `API_BASE_URL` (default production: `https://fashionai-api-6w7k.onrender.com`). All paths below are relative to that origin.
 
 ## Auth
 

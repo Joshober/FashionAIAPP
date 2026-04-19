@@ -26,7 +26,7 @@ API listens on `PORT` (default **4000**). Configure `ALLOWED_ORIGINS` for your F
 
 Prerequisites: **Flutter SDK** on your PATH.
 
-Configure the API host in [`assets/env/dev.env`](assets/env/dev.env) (`API_BASE_URL`). For Android emulator pointing at a backend on the same machine, `http://10.0.2.2:4000` is the default in that file. For a physical device, use your computer’s LAN IP.
+The app defaults to the deployed API **`https://fashionai-api-6w7k.onrender.com`** (see [`lib/core/env.dart`](lib/core/env.dart) and [`assets/env/dev.env`](assets/env/dev.env)). Override `API_BASE_URL` in `assets/env/dev.env` or with `--dart-define=API_BASE_URL=http://127.0.0.1:4000` for a local backend.
 
 Optional **Auth0** (public identifiers only in the app): set `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_AUDIENCE`, and `AUTH0_SCHEME` in `assets/env/dev.env`. For Android, you can also set `AUTH0_DOMAIN` / `AUTH0_SCHEME` in `android/local.properties` for manifest placeholders used by the Auth0 SDK.
 
@@ -35,7 +35,7 @@ flutter pub get
 flutter run
 ```
 
-On startup the app loads [`assets/env/dev.env`](assets/env/dev.env) via `flutter_dotenv`. You can override `API_BASE_URL` at build time with `--dart-define=API_BASE_URL=http://YOUR_HOST:4000` if you prefer not to edit the env file.
+On startup the app loads env assets via `flutter_dotenv` (see `lib/main.dart`). `--dart-define=API_BASE_URL=...` still overrides everything for ad-hoc builds.
 
 ## Security
 
