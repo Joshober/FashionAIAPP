@@ -5,14 +5,14 @@ Build Flutter screens and navigation until feature parity with the former SPA co
 ## Acceptance criteria
 
 - [ ] Navigation structure covers all primary flows above.
-- [ ] Screens call the shared API client from [08-flutter-integration.md](./08-flutter-integration.md); handle loading and error states consistently.
+- [ ] Screens call the shared API client from [08-flutter-integration.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/08-flutter-integration.md); handle loading and error states consistently.
 - [ ] Upload uses multipart to backend Prendas endpoint; images display from returned `imagen_url`.
 - [ ] Settings screen reads/writes `/api/me` merged profile.
 - [ ] README or in-app dev notes describe how to point the app at a dev API.
 
 ## References
 
-- [lib/main.dart](../../lib/main.dart) and new files under `lib/`.
+- [lib/main.dart](https://github.com/Joshober/FashionAIAPP/blob/main/lib/main.dart) and new files under `lib/`.
 
 ## Dependencies
 
