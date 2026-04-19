@@ -1,6 +1,6 @@
 ## Goal
 
-Freeze and document HTTP contracts for HF Space, OpenRouter, and auth expectations in `backend/README.md` or [docs/CONTRACTS.md](../CONTRACTS.md). Add integration-style tests with **mocked** outbound HTTP (e.g. mocked axios) for classify and OpenRouter paths so CI does not call real services or require secrets.
+Freeze and document HTTP contracts for HF Space, OpenRouter, and auth expectations in `backend/README.md` or [docs/CONTRACTS.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/CONTRACTS.md). Add integration-style tests with **mocked** outbound HTTP (e.g. mocked axios) for classify and OpenRouter paths so CI does not call real services or require secrets.
 
 ## Acceptance criteria
 
