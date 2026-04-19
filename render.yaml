@@ -1,0 +1,48 @@
+# Render Blueprint (free tier): Node API + Flutter web (Docker/nginx).
+# URLs follow https://<service-name>.onrender.com — keep these names or update
+# ALLOWED_ORIGINS / API_BASE_URL together.
+#
+# First deploy: set MONGODB_URI (e.g. MongoDB Atlas free M0) and OPENROUTER_API_KEY
+# in the dashboard when Render prompts for sync: false vars.
+#
+# Auth0 (optional): set AUTH0_DOMAIN + AUTH0_AUDIENCE; add callback
+# https://fashionai-web.onrender.com/auth-callback to your Auth0 app.
+
+services:
+  - type: web
+    name: fashionai-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDirectory: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22.12.0"
+      - key: ALLOWED_ORIGINS
+        value: "https://fashionai-web.onrender.com,http://localhost:*,http://127.0.0.1:*"
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: AUTH0_DOMAIN
+        sync: false
+      - key: AUTH0_AUDIENCE
+        sync: false
+
+  - type: web
+    name: fashionai-web
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile.web
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      # Passed as Docker build ARG (see Dockerfile.web) and at runtime.
+      - key: API_BASE_URL
+        value: https://fashionai-api.onrender.com
