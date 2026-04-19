@@ -12,7 +12,7 @@ Implement outfit recommendation and persistence plus user defaults: `GET /api/ou
 
 ## References
 
-- Depends on Prenda data from [04-prendas-crud.md](./04-prendas-crud.md).
+- Depends on Prenda data from [04-prendas-crud.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/04-prendas-crud.md).
 
 ## Dependencies
 
