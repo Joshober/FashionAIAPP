@@ -149,7 +149,7 @@ class SwEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _DashedRectPainter(color: SwColors.border.withValues(alpha: 0.9)),
+      painter: _DashedRectPainter(color: SwColors.border.withOpacity(0.9)),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 18),
         child: Column(

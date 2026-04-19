@@ -4,10 +4,14 @@ ARG API_BASE_URL=https://fashionai-api-6w7k.onrender.com
 FROM ghcr.io/cirruslabs/flutter:stable AS build
 ARG API_BASE_URL
 WORKDIR /app
-COPY pubspec.yaml pubspec.lock ./
+# Resolve from pubspec.yaml only: a broken or stale pubspec.lock in the repo
+# would otherwise fail `pub get` before the full source tree is available.
+COPY pubspec.yaml ./
 RUN flutter pub get
 COPY . .
-RUN flutter build web --release --dart-define=API_BASE_URL=${API_BASE_URL}
+# Re-resolve after full tree copy so a stale/out-of-sync pubspec.lock from the repo
+# cannot leave .dart_tool out of sync before compile.
+RUN flutter pub get && flutter build web --release --dart-define=API_BASE_URL=${API_BASE_URL}
 
 FROM nginx:1.27-alpine
 COPY --from=build /app/build/web /usr/share/nginx/html

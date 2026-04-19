@@ -311,7 +311,7 @@ class _HeroBlock extends StatelessWidget {
                     colors: [
                       SwColors.light,
                       SwColors.white,
-                      SwColors.accent.withValues(alpha: 0.12),
+                      SwColors.accent.withOpacity(0.12),
                     ],
                   ),
                 ),
@@ -322,8 +322,8 @@ class _HeroBlock extends StatelessWidget {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      SwColors.black.withValues(alpha: 0.55),
-                      SwColors.black.withValues(alpha: 0.05),
+                      SwColors.black.withOpacity(0.55),
+                      SwColors.black.withOpacity(0.05),
                     ],
                   ),
                 ),
