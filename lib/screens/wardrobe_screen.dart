@@ -255,6 +255,7 @@ class _WardrobeScreenState extends ConsumerState<WardrobeScreen> {
                             final tipo = p['tipo']?.toString() ?? '';
                             final cls = p['clase_nombre']?.toString() ?? '';
                             final occ = (p['ocasion'] as List?)?.take(2).join(', ') ?? '';
+                            final id = p['_id']?.toString() ?? '';
                             return PrendaTileCard(
                               imageUrl: url,
                               category: tipo.isEmpty ? 'Garment' : garmentFilterLabel(tipo),

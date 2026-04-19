@@ -144,7 +144,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     } else {
       if (await _recorder.hasPermission()) {
         if (kIsWeb) {
-          await _recorder.start(const RecordConfig(encoder: AudioEncoder.wav));
+          // record_web still expects a logical filename for the blob download.
+          await _recorder.start(
+            const RecordConfig(encoder: AudioEncoder.wav),
+            path: 'chat_stt.wav',
+          );
         } else {
           final dir = await getTemporaryDirectory();
           await _recorder.start(

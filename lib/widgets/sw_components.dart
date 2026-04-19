@@ -202,7 +202,8 @@ class _DashedRectPainter extends CustomPainter {
       var draw = true;
       while (t < len) {
         final step = draw ? dash : gap;
-        final t2 = (t + step).clamp(0, len);
+        var t2 = t + step;
+        if (t2 > len) t2 = len;
         if (draw) canvas.drawLine(a + unit * t, a + unit * t2, paint);
         t = t2;
         draw = !draw;
