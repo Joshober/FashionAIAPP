@@ -12,7 +12,7 @@ Scaffold a new `backend/` Express service with environment loading, a single COR
 
 ## References
 
-- Root Flutter app: [pubspec.yaml](../../pubspec.yaml), [lib/main.dart](../../lib/main.dart).
+- Root Flutter app: [pubspec.yaml](https://github.com/Joshober/FashionAIAPP/blob/main/pubspec.yaml), [lib/main.dart](https://github.com/Joshober/FashionAIAPP/blob/main/lib/main.dart).
 - Plan: first backend milestone before Mongo and classification.
 
 ## Dependencies
