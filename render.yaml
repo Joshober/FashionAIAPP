@@ -9,8 +9,8 @@
 # wizard skipped sync: false vars, add MONGODB_URI under Environment manually.
 # Also set OPENROUTER_API_KEY for chat/audio features.
 #
-# Auth0 (optional): set AUTH0_DOMAIN + AUTH0_AUDIENCE; add callback
-# https://fashionai-web.onrender.com/auth-callback to your Auth0 app.
+# Auth0 (optional): set AUTH0_DOMAIN + AUTH0_AUDIENCE; add Allowed Callback URL
+# https://fashionai-web.onrender.com/auth.html (Webapp: static web/auth.html for flutter_web_auth_2).
 
 services:
   - type: web
