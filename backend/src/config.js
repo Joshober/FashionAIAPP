@@ -1,9 +1,13 @@
+/** Hugging Face Space for ViT / classify (not configurable via env). */
+export const HF_VIT_SPACE_URL = 'https://alvaro05-vit-fashion-api.hf.space';
+
 /**
  * @returns {import('./config.types.js').AppConfig}
  */
 export function loadConfig() {
   const originsRaw = process.env.ALLOWED_ORIGINS || 'http://localhost:*,http://127.0.0.1:*';
   const port = Number(process.env.PORT || 4000);
+  const hfVit = HF_VIT_SPACE_URL.replace(/\/$/, '');
 
   return {
     port,
@@ -13,8 +17,8 @@ export function loadConfig() {
     auth0Domain: process.env.AUTH0_DOMAIN || '',
     auth0Audience: process.env.AUTH0_AUDIENCE || '',
     jwtSecret: process.env.JWT_SECRET || '',
-    mlServiceUrl: (process.env.ML_SERVICE_URL || process.env.ML_VIT_SERVICE_URL || 'https://alvaro05-vit-fashion-api.hf.space').replace(/\/$/, ''),
-    mlVitServiceUrl: (process.env.ML_VIT_SERVICE_URL || process.env.ML_SERVICE_URL || 'https://alvaro05-vit-fashion-api.hf.space').replace(/\/$/, ''),
+    mlServiceUrl: hfVit,
+    mlVitServiceUrl: hfVit,
     openrouterApiKey: process.env.OPENROUTER_API_KEY || '',
     openrouterBaseUrl: (process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/$/, ''),
     openrouterModel: process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini',

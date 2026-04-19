@@ -1,0 +1,18 @@
+# Flutter web → nginx. Render sets API_BASE_URL as env (also available as build ARG).
+ARG API_BASE_URL=https://fashionai-api.onrender.com
+FROM ghcr.io/cirruslabs/flutter:3.29.0 AS build
+ARG API_BASE_URL
+WORKDIR /app
+COPY pubspec.yaml pubspec.lock ./
+RUN flutter pub get
+COPY . .
+RUN flutter build web --release --dart-define=API_BASE_URL=${API_BASE_URL}
+
+FROM nginx:1.27-alpine
+COPY --from=build /app/build/web /usr/share/nginx/html
+COPY render/nginx-site.conf /tmp/nginx-site.conf
+COPY render/docker-entrypoint-web.sh /docker-entrypoint-web.sh
+RUN chmod +x /docker-entrypoint-web.sh
+ENV PORT=10000
+EXPOSE 10000
+ENTRYPOINT ["/docker-entrypoint-web.sh"]
