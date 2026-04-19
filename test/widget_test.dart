@@ -1,22 +1,28 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your application, use the
-// WidgetTester utility in the flutter_test package. For example, you can send
-// tap and scroll gestures. You can also use WidgetTester to find child widgets
-// in the widget tree, read text, and verify that the values of widget
-// properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:fashion_ai/main.dart';
+import 'package:fashion_ai/providers/auth_token.dart';
 
 void main() {
-  testWidgets('Fashion AI home smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const FashionAIApp());
+  testWidgets('Fashion AI app smoke test', (WidgetTester tester) async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load(fileName: 'assets/env/dev.env');
 
-    expect(find.text('Fashion AI'), findsOneWidget);
-    expect(find.text('Welcome to Fashion AI'), findsOneWidget);
-    expect(find.byIcon(Icons.style_rounded), findsOneWidget);
+    final container = ProviderContainer();
+    await container.read(authTokenProvider.notifier).restore();
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const FashionAIApp(),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Dashboard'), findsOneWidget);
   });
 }
