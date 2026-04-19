@@ -20,7 +20,7 @@ See [`.env.example`](../.env.example) in the repo root for variable names. Impor
 - **Mongo**: `MONGODB_URI`, optional `MONGODB_DB_NAME`
 - **CORS**: `ALLOWED_ORIGINS` (comma-separated; supports `http://localhost:*` patterns)
 - **Auth0** (optional): `AUTH0_DOMAIN`, `AUTH0_AUDIENCE` — when set, JWTs are verified; otherwise tokens are only decoded for `sub` (dev convenience)
-- **HF**: `ML_SERVICE_URL` / `ML_VIT_SERVICE_URL` — must stay on the allowlisted Space URL
+- **HF / ViT**: fixed in code at `https://alvaro05-vit-fashion-api.hf.space` (`HF_VIT_SPACE_URL` in `src/config.js`)
 - **OpenRouter**: `OPENROUTER_API_KEY`, models, `MAX_AUDIO_BASE64_CHARS`, `MAX_TTS_CHARS`
 
 ## Route prefixes

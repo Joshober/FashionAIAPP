@@ -4,7 +4,7 @@ Implement garment classification by proxying the configured Hugging Face Space o
 
 ## Acceptance criteria
 
-- [ ] `POST` multipart classify forwards to allowlisted `ML_SERVICE_URL` / `ML_VIT_SERVICE_URL` only (no arbitrary URLs).
+- [ ] `POST` multipart classify forwards only to the hardcoded HF Space `HF_VIT_SPACE_URL` in `backend/src/config.js` (no env-based arbitrary URLs).
 - [ ] Request field name `imagen` matches HF Space contract; response maps to `clase_nombre` / `confianza` with merge logic for `top3[0]` vs placeholders.
 - [ ] `vitClassToTipo` maps ViT labels to `tipo` for the wardrobe model.
 - [ ] Optional `vit-base64` path with payload limits documented.
