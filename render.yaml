@@ -1,4 +1,6 @@
 # Render Blueprint (free tier): Node API + Flutter web (Docker/nginx).
+# - API (`fashionai-api`): builds from the repo default branch (main).
+# - Web (`fashionai-web`): builds from branch `Webapp` (Flutter web parity).
 # URLs follow https://<service-name>.onrender.com — keep these names or update
 # ALLOWED_ORIGINS / API_BASE_URL together.
 #
@@ -36,6 +38,7 @@ services:
 
   - type: web
     name: fashionai-web
+    branch: Webapp
     runtime: docker
     plan: free
     region: oregon
