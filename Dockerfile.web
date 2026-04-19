@@ -15,7 +15,7 @@ RUN flutter pub get && flutter build web --release --dart-define=API_BASE_URL=${
 
 FROM nginx:1.27-alpine
 COPY --from=build /app/build/web /usr/share/nginx/html
-COPY render/nginx-site.conf /tmp/nginx-site.conf
+COPY render/nginx-site.conf /etc/nginx-site.conf.tmpl
 COPY render/docker-entrypoint-web.sh /docker-entrypoint-web.sh
 RUN chmod +x /docker-entrypoint-web.sh
 ENV PORT=10000
