@@ -8,11 +8,11 @@ Add Flutter dependencies and a central API client that targets `API_BASE_URL` (v
 - [ ] Auth0 Flutter SDK (or equivalent OIDC) wired for domain + client ID (public identifiers only).
 - [ ] Token persistence uses secure storage on supported platforms.
 - [ ] API client attaches Bearer token when present; behaves per backend contract when anonymous.
-- [ ] Document local run flags in [README.md](../../README.md) (e.g. sample `--dart-define=API_BASE_URL=...`).
+- [ ] Document local run flags in [README.md](https://github.com/Joshober/FashionAIAPP/blob/main/README.md) (e.g. sample `--dart-define=API_BASE_URL=...`).
 
 ## References
 
-- [pubspec.yaml](../../pubspec.yaml), [lib/main.dart](../../lib/main.dart).
+- [pubspec.yaml](https://github.com/Joshober/FashionAIAPP/blob/main/pubspec.yaml), [lib/main.dart](https://github.com/Joshober/FashionAIAPP/blob/main/lib/main.dart).
 
 ## Dependencies
 
