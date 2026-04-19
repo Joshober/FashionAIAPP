@@ -13,8 +13,8 @@ Add MongoDB via Mongoose with models aligned to the product spec (**Prenda**, **
 
 ## References
 
-- Follows [01-backend-skeleton.md](./01-backend-skeleton.md) scaffold.
-- Document env vars in `backend/README.md` or [docs/CONTRACTS.md](../CONTRACTS.md) when added.
+- Follows [01-backend-skeleton.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/gh-issues/01-backend-skeleton.md) scaffold.
+- Document env vars in `backend/README.md` or [docs/CONTRACTS.md](https://github.com/Joshober/FashionAIAPP/blob/main/docs/CONTRACTS.md) when added.
 
 ## Dependencies
 
